@@ -1,0 +1,31 @@
+name: Build Windows artifact
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
+      - name: Build
+        shell: powershell
+        run: .\tools\build.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chrome-diagnostic-windows
+          path: |
+            dist/ChromeDiagnostic.exe
+            dist/Chrome-Diagnostic-Setup-*.exe
+            dist/SHA256SUMS.txt
